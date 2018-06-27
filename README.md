@@ -20,7 +20,7 @@ This is how the graph looks like after applying these scripts:
 ## How to apply the Replication Monitoring Template for Zabbix
 1. Installing the Oracle Client on your Zabbix Server (CentOS 7 in this case)
 
-You can [download the files here](http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html)
+You can [download the latest files here](http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html)
 
 ```
 ## Files names are:
@@ -32,7 +32,34 @@ oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm
 yum localinstall oracle-instantclient11.2-* --nogpgcheck
 ```
 
-2. Creating your environment script for the Oracle Client
+2. Setting up your `tnsnames.ora` file
+```
+#vim $ORACLE_HOME/network/admin/tnsnames.ora
+
+MYDB1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+     (ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.1)(PORT=1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = testdb)
+    )
+  )
+
+MYDB2 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+     (ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.2)(PORT=1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = testdb)
+    )
+  )
+
+
+```
+
+3. Creating your environment script for the Oracle Client
 ```
 vim /etc/profile.d/client.sh
 export ORACLE_HOME=/usr/lib/oracle/11.2/client64
@@ -42,7 +69,7 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 
 ```
 
-3. Creating the `check_oracle_replication_master.sh` script:
+4. Creating the `check_oracle_replication_master.sh` script:
 
 ```
 # cd /usr/lib/zabbix/externalscripts/
@@ -68,7 +95,7 @@ echo "$COUNT_DB1"
 exit
 ```
 
-4. Creating the `check_oracle_replication_slave.sh` script:
+5. Creating the `check_oracle_replication_slave.sh` script:
 
 ```
 # cd /usr/lib/zabbix/externalscripts/
@@ -94,9 +121,9 @@ exit
 
 ```
 
-5. Download the files [check_replication_db1.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db1.sh) and [check_replication_db2.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db2.sh).
-6. Put the files in `/usr/lib/zabbix/externalscripts`
-7. Applying permissions to the files
+6. Download the files [check_replication_db1.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db1.sh) and [check_replication_db2.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db2.sh).
+7. Put the files in `/usr/lib/zabbix/externalscripts`
+8. Applying permissions to the files
 ```
 cd /usr/lib/zabbix/externalscripts/
 chown zabbix:zabbix *
@@ -104,5 +131,5 @@ chmod +x check_oracle_replication_slave.sh check_oracle_replication_master.sh
 
 ```
 
-8. Test the scripts by running them: `./check_oracle_replication_master.sh`
+9. Test the scripts by running them: `./check_oracle_replication_master.sh`
 ![The output should look like](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/docs/images/db1_run_script.png)
