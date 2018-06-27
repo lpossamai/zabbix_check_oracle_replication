@@ -17,7 +17,7 @@ __NOTE__: This was done on Oracle 11G Standard Edition
 This is how the graph looks like after applying these scripts:
 ![Replication Delay between a Master and a Slave Oracle DB](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/docs/images/db2_archive_log_photo.png)
 
-## How to apply the Replication Monitoring Template for Zabbix
+## Setting up the scripts, Oracle Listener and required files
 1. Installing the Oracle Client on your Zabbix Server (CentOS 7 in this case)
 
 You can [download the latest files here](http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html)
@@ -133,3 +133,49 @@ chmod +x check_oracle_replication_slave.sh check_oracle_replication_master.sh
 
 9. Test the scripts by running them: `./check_oracle_replication_master.sh`
 ![The output should look like](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/docs/images/db1_run_script.png)
+
+## Setting up the Zabbix part
+1. Create a new template: `CONFIGURATION > TEMPLATES > CREATE TEMPLATE`
+```
+Template name: Template Oracle Standby DB
+Groups: Templates/Databases
+```
+
+2. Create a new application called `oracle`
+3. In Items, create a new Item `Primary archived log sequence`:
+```
+Name: Primary archived log sequence
+Type: External Check
+key: check_replication_master.sh
+Update interval: 30s
+Applications: Oracle
+```
+
+4. In Items, create a new Item `Standby archived log sequence`:
+```
+Name: Standby archived log sequence
+Type: External Check
+key: check_replication_slave.sh
+Update interval: 31s
+Applications: Oracle
+```
+
+5. In Items, create a new Item `DB2 Oracle Replication Delay (Number of archivelogs behind)`:
+```
+Name: DB2 Oracle Replication Delay (Number of archivelogs behind)
+Type: Calculated
+key: archivelog_gap
+Formula: last("check_replication_master.sh")-last("check_replication_slave.sh")
+Update interval: 1m
+Applications: Oracle
+```
+
+6. Create a new Trigger `Oracle Replication delay is too high on {HOST.NAME}`:
+```
+Name: Oracle Replication delay is too high on {HOST.NAME}
+Severity: Warning
+Expression (If the replication gap is higher than 30, then it will trigger): ({TRIGGER.VALUE}=0 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>30) or ({TRIGGER.VALUE}=1 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>29)
+```
+
+7. Apply the new template to your Standby Oracle DB.
+8. You can monitor the data from the __Latest Data__ page.
