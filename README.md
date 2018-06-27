@@ -14,4 +14,4 @@ What we'll be using:
 4. You'll need SSH access to the Oracle DB you want to monitor
 
 This is how the graph looks like after applying these scripts:
-(https://github.com/lpossamai/zabbix_check_oracle_replication/docs/images/db2_archive_log_photo.png)
+![Replication Delay between a Master and a Slave Oracle DB](https://github.com/lpossamai/zabbix_check_oracle_replication/docs/images/db2_archive_log_photo.png)
