@@ -104,7 +104,7 @@ exit
 #!/bin/sh
 #
 # check_replication_slave.sh
-# This script will check the last applied archiving log on db2.datacentre.motorweb.co.nz
+# This script will check the last applied archiving log on db2
 #
 
 # You need to have these paths setup otherwise script won't work.
