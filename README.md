@@ -12,20 +12,23 @@ __NOTE__: This was done on Oracle 11G Standard Edition
 2. Bash
 3. You'll need the `System/sys` Oracle password
 4. You'll need SSH access to the Oracle DB you want to monitor
+5. An account (it is free) at http://www.oracle.com
 
 This is how the graph looks like after applying these scripts:
 ![Replication Delay between a Master and a Slave Oracle DB](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/docs/images/db2_archive_log_photo.png)
 
 ## How to apply the Replication Monitoring Template for Zabbix
 1. Installing the Oracle Client on your Zabbix Server (CentOS 7 in this case)
+
+You can [download the files here](http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html)
+
 ```
-## Files name:
+## Files names are:
 oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
 oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
 oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm
 
-## [Download here](http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) the files (You'll need an account)
-## Installing
+## Installing it
 yum localinstall oracle-instantclient11.2-* --nogpgcheck
 ```
 
@@ -40,9 +43,10 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 ```
 
 3. Creating the `check_oracle_replication_master.sh` script:
+
 ```
 # cd /usr/lib/zabbix/externalscripts/
-# vim check_oracle_replication_master
+# vim check_oracle_replication_master.sh
 
 #!/bin/sh
 #
@@ -63,3 +67,42 @@ echo "$COUNT_DB1"
 
 exit
 ```
+
+4. Creating the `check_oracle_replication_slave.sh` script:
+
+```
+# cd /usr/lib/zabbix/externalscripts/
+# vim check_oracle_replication_slave.sh
+
+#!/bin/sh
+#
+# check_replication_slave.sh
+# This script will check the last applied archiving log on db2.datacentre.motorweb.co.nz
+#
+
+# You need to have these paths setup otherwise script won't work.
+export ORACLE_HOME=/usr/lib/oracle/11.2/client64
+export PATH=$PATH:$ORACLE_HOME/lib:/usr/sbin:/usr/bin
+export ORACLE_SID=testdb
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+
+# Getting the max(sequence) value from v$log_history
+COUNT_DB2=$(sqlplus64 sys/syspasswordhere@mydb2 as sysdba @/usr/lib/zabbix/externalscripts/check_replication_db2.sql | awk 'FNR>=14 && FNR<=14')
+
+echo "$COUNT_DB2"
+exit
+
+```
+
+5. Download the files [check_replication_db1.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db1.sh) and [check_replication_db2.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db2.sh).
+6. Put the files in `/usr/lib/zabbix/externalscripts`
+7. Applying permissions to the files
+```
+cd /usr/lib/zabbix/externalscripts/
+chown zabbix:zabbix *
+chmod +x check_oracle_replication_slave.sh check_oracle_replication_master.sh
+
+```
+
+8. Test the scripts by running them: `./check_oracle_replication_master.sh`
+![The output should look like](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/docs/images/db1_run_script.png)
