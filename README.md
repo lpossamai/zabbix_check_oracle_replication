@@ -121,7 +121,7 @@ exit
 
 ```
 
-6. Download the files [check_replication_db1.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db1.sh) and [check_replication_db2.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/tree/master/check_replication_db2.sh).
+6. Download the files [check_replication_db1.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/check_replication_db1.sql) and [check_replication_db2.sql](https://github.com/lpossamai/zabbix_check_oracle_replication/blob/master/check_replication_db2.sql).
 7. Put the files in `/usr/lib/zabbix/externalscripts`
 8. Applying permissions to the files
 ```
