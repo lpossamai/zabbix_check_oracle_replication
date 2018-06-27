@@ -174,7 +174,10 @@ Applications: Oracle
 ```
 Name: Oracle Replication delay is too high on {HOST.NAME}
 Severity: Warning
-Expression (If the replication gap is higher than 30, then it will trigger): ({TRIGGER.VALUE}=0 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>30) or ({TRIGGER.VALUE}=1 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>29)
+```
+Expression (If the replication gap is higher than 30, then it will trigger): 
+```
+({TRIGGER.VALUE}=0 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>30) or ({TRIGGER.VALUE}=1 and {Template Oracle Standby DB:archivelog_gap.min(10m)}>29)
 ```
 
 7. Apply the new template to your Standby Oracle DB.
