@@ -6,7 +6,7 @@
 
 # You need to have these paths setup otherwise script won't work.
 export ORACLE_HOME=/usr/lib/oracle/11.2/client64
-export PATH=$PATH:$ORACLE_HOME/lib:/usr/sbin:/usr/bin
+export PATH="$PATH":$ORACLE_HOME/lib:/usr/sbin:/usr/bin
 export ORACLE_SID=testdb
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 
